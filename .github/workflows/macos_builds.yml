@@ -23,6 +23,14 @@ jobs:
             bin: ./bin/godot.macos.editor.universal
             cache-limit: 1
 
+          - name: Mono Editor (target=editor, tests=yes, mono=yes)
+            cache-name: macos-editor-mono
+            target: editor
+            tests: true
+            sconsflags: module_mono_enabled=yes
+            bin: ./bin/godot.macos.editor.mono.universal
+            cache-limit: 1
+
           - name: Template (target=template_release, tests=yes)
             cache-name: macos-template
             target: template_release
@@ -49,6 +57,11 @@ jobs:
       - name: Setup Vulkan SDK
         run: |
           sh misc/scripts/install_vulkan_sdk_macos.sh
+
+      - name: Install Mono
+        if: contains(matrix.name, 'mono=yes')
+        run: |
+          brew install mono
 
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
