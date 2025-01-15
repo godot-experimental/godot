@@ -130,6 +130,23 @@ jobs:
         if: ${{ matrix.cache-name == 'windows-editor-mono' }}
         run: python modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin
 
+      - name: Package Export Templates into .tpz
+        if: matrix.name == 'Template with Mono (target=template_release, tests=no)'
+        run: |
+          mkdir templates
+          mkdir templates/windows.debug.x86_64
+          mkdir templates/windows.release.x86_64
+          mv ${{ matrix.bin-debug }} templates/windows.debug.x86_64/
+          mv ${{ matrix.bin-release }} templates/windows.release.x86_64/
+          powershell Compress-Archive -Path templates/* -DestinationPath export_templates.tpz
+
+      - name: Upload .tpz Artifact
+        if: matrix.name == 'Template with Mono (target=template_release, tests=no)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: export_templates
+          path: ./export_templates.tpz
+
       - name: Save Godot build cache
         uses: ./.github/actions/godot-cache-save
         with:
