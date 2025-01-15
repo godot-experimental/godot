@@ -21,7 +21,7 @@ jobs:
             target: editor
             tests: true
             bin: ./bin/godot.macos.editor.universal
-            cache-limit: 1
+            cache-limit: 2
 
           - name: Mono Editor (target=editor, tests=yes, mono=yes)
             cache-name: macos-editor-mono
@@ -29,7 +29,7 @@ jobs:
             tests: true
             sconsflags: module_mono_enabled=yes
             bin: ./bin/godot.macos.editor.mono.universal
-            cache-limit: 1
+            cache-limit: 2
 
           - name: Template (target=template_release, tests=yes)
             cache-name: macos-template
