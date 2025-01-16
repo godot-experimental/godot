@@ -23,14 +23,17 @@ jobs:
             bin: ./bin/godot.macos.editor.universal
             cache-limit: 2
 
-          - name: Editor /w Mono (target=editor, mono=yes)
+          - name: Editor w/ Mono (target=editor, mono=yes)
             cache-name: macos-editor-mono
             target: editor
-            build-mono: true
-            tests: false
-            artifact: true
-            sconsflags: module_mono_enabled=yes debug_symbols=no vsproj=yes vsproj_gen_only=no
+            sconsflags: module_mono_enabled=yes debug_symbols=no
             bin: ./bin/godot.macos.editor.mono.universal
+            build-mono: true
+            tests: false # Disabled due freeze caused by mix Mono build and CI
+            doc-test: true
+            proj-conv: true
+            api-compat: true
+            artifact: true
             cache-limit: 2
 
           - name: Template (target=template_release, tests=yes)
@@ -71,9 +74,11 @@ jobs:
           scons platform=macos target=editor tools=yes mono_glue=no
           scons platform=macos target=editor tools=yes module_mono_enabled=yes mono_glue=yes
 
-      - name: Build GodotSharp (Mono only)
-        if: contains(matrix.name, 'mono=yes')
-        run: python modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin
+      - name: Build .NET solutions
+        if: matrix.build-mono
+        run: |
+          dotnet --info
+          ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=macos --werror
 
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
@@ -110,6 +115,11 @@ jobs:
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}
+
+      - name: .NET source generators tests
+        if: matrix.build-mono
+        run: |
+          dotnet test modules/mono/editor/Godot.NET.Sdk/Godot.SourceGenerators.Tests
 
       - name: Unit tests
         if: matrix.tests
