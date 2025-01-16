@@ -75,7 +75,7 @@ jobs:
         if: contains(matrix.name, 'mono=yes')
         run: |
           mkdir -p ./modules/mono/glue/GodotSharp
-          msbuild ./modules/mono/glue/GodotSharp/GodotSharp.sln /p:Configuration=Release /p:Platform=AnyCPU
+          msbuild ./modules/mono/glue/GodotSharp/GodotSharp.sln /p:Configuration=Release
 
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
