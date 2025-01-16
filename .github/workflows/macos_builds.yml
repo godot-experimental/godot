@@ -23,11 +23,13 @@ jobs:
             bin: ./bin/godot.macos.editor.universal
             cache-limit: 2
 
-          - name: Mono Editor (target=editor, tests=yes, mono=yes)
+          - name: Editor /w Mono (target=editor, mono=yes)
             cache-name: macos-editor-mono
             target: editor
-            tests: true
-            sconsflags: module_mono_enabled=yes
+            build-mono: true
+            tests: false
+            artifact: true
+            sconsflags: module_mono_enabled=yes debug_symbols=no vsproj=yes vsproj_gen_only=no
             bin: ./bin/godot.macos.editor.mono.universal
             cache-limit: 2
 
