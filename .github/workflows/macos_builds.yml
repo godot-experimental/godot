@@ -74,12 +74,6 @@ jobs:
           scons platform=macos target=editor tools=yes mono_glue=no
           scons platform=macos target=editor tools=yes module_mono_enabled=yes mono_glue=yes
 
-      - name: Build .NET solutions
-        if: matrix.build-mono
-        run: |
-          dotnet --info
-          ./modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin --godot-platform=macos --werror
-
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
         with:
