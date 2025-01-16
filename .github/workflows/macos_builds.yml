@@ -65,6 +65,18 @@ jobs:
         run: |
           brew install mono
 
+      - name: Generate Glue (Mono only)
+        if: contains(matrix.name, 'mono=yes')
+        run: |
+          scons platform=macos target=editor tools=yes mono_glue=no
+          scons platform=macos target=editor tools=yes module_mono_enabled=yes mono_glue=yes
+
+      - name: Build GodotSharp (Mono only)
+        if: contains(matrix.name, 'mono=yes')
+        run: |
+          mkdir -p ./modules/mono/glue/GodotSharp
+          msbuild ./modules/mono/glue/GodotSharp/GodotSharp.sln /p:Configuration=Release /p:Platform=AnyCPU
+
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
         with:
