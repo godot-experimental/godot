@@ -73,9 +73,7 @@ jobs:
 
       - name: Build GodotSharp (Mono only)
         if: contains(matrix.name, 'mono=yes')
-        run: |
-          mkdir -p ./modules/mono/glue/GodotSharp
-          msbuild ./modules/mono/glue/GodotSharp/GodotSharp.sln /p:Configuration=Release
+        run: python modules/mono/build_scripts/build_assemblies.py --godot-output-dir=./bin
 
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
