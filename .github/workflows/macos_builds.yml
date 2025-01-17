@@ -23,19 +23,6 @@ jobs:
             bin: ./bin/godot.macos.editor.universal
             cache-limit: 2
 
-          - name: Editor w/ Mono (target=editor, mono=yes)
-            cache-name: macos-editor-mono
-            target: editor
-            sconsflags: module_mono_enabled=yes debug_symbols=no
-            bin: ./bin/godot.macos.editor.mono.universal
-            build-mono: true
-            tests: false # Disabled due freeze caused by mix Mono build and CI
-            doc-test: true
-            proj-conv: true
-            api-compat: true
-            artifact: true
-            cache-limit: 2
-
           - name: Template (target=template_release, tests=yes)
             cache-name: macos-template
             target: template_release
@@ -62,17 +49,6 @@ jobs:
       - name: Setup Vulkan SDK
         run: |
           sh misc/scripts/install_vulkan_sdk_macos.sh
-
-      - name: Install Mono
-        if: contains(matrix.name, 'mono=yes')
-        run: |
-          brew install mono
-
-      - name: Generate Glue (Mono only)
-        if: contains(matrix.name, 'mono=yes')
-        run: |
-          scons platform=macos target=editor tools=yes mono_glue=no
-          scons platform=macos target=editor tools=yes module_mono_enabled=yes mono_glue=yes
 
       - name: Compilation (x86_64)
         uses: ./.github/actions/godot-build
