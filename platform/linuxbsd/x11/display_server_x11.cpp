@@ -5926,7 +5926,7 @@ Error DisplayServerX11::embed_process(WindowID p_window, OS::ProcessID p_pid, co
 	return OK;
 }
 
-Error DisplayServerX11::remove_embedded_process(OS::ProcessID p_pid) {
+Error DisplayServerX11::request_close_embedded_process(OS::ProcessID p_pid) {
 	_THREAD_SAFE_METHOD_
 
 	if (!embedded_processes.has(p_pid)) {
@@ -5955,6 +5955,20 @@ Error DisplayServerX11::remove_embedded_process(OS::ProcessID p_pid) {
 
 	// Restore default error handler.
 	XSetErrorHandler(oldHandler);
+
+	return OK;
+}
+
+Error DisplayServerX11::remove_embedded_process(OS::ProcessID p_pid) {
+	_THREAD_SAFE_METHOD_
+
+	if (!embedded_processes.has(p_pid)) {
+		return ERR_DOES_NOT_EXIST;
+	}
+
+	EmbeddedProcessData *ep = embedded_processes.get(p_pid);
+
+	request_close_embedded_process(p_pid);
 
 	embedded_processes.erase(p_pid);
 	memdelete(ep);
@@ -6276,7 +6290,7 @@ DisplayServerX11::WindowID DisplayServerX11::_create_window(WindowMode p_mode, V
 			}
 		}
 
-		if (wd.is_popup || wd.no_focus || wd.embed_parent) {
+		if (wd.is_popup || wd.no_focus || (wd.embed_parent && !kde5_embed_workaround)) {
 			// Set Utility type to disable fade animations.
 			Atom type_atom = XInternAtom(x11_display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
 			Atom wt_atom = XInternAtom(x11_display, "_NET_WM_WINDOW_TYPE", False);
@@ -6422,6 +6436,7 @@ DisplayServerX11::DisplayServerX11(const String &p_rendering_driver, WindowMode 
 	KeyMappingX11::initialize();
 
 	xwayland = OS::get_singleton()->get_environment("XDG_SESSION_TYPE").to_lower() == "wayland";
+	kde5_embed_workaround = OS::get_singleton()->get_environment("XDG_CURRENT_DESKTOP").to_lower() == "kde" && OS::get_singleton()->get_environment("KDE_SESSION_VERSION") == "5";
 
 	native_menu = memnew(NativeMenu);
 	context = p_context;
